@@ -1,0 +1,1411 @@
+
+**************************************************
+Advanced React Native Note Script
+**************************************************
+//--------------------------------------------------------------
+# วันที่ 1
+//--------------------------------------------------------------
+ตรวจสอบความพร้อมของเครื่องมือ
+
+VS Code
+---
+$ code -v
+
+Node JS
+---
+$ node -v
+$ npm -v
+$ npx -v
+
+Git
+---
+$ git  version
+
+Java JDK
+---
+$ java -version
+$ set JAVA_HOME
+
+Android SDK
+---
+$ android list target  (Windows)
+$ avdmanager list target (MacOS)
+
+MySQL
+---
+$ mysql -u root -p
+$ mysql -P 3333 -u root -p
+
+ADB Devices
+---
+$ adb devices
+
+ตรวจสอบเวอร์ชั่น React Native CLI
+---
+$ react-native -v
+
+ถอน React Native CLI เวอร์ชั่นปัจจุบันออก
+---
+$ npm uninstall -g react-native-cli
+
+ติดตั้ง React Native CLI
+---
+$ npm install -g react-native-cli
+
+บน MacOS
+---
+$ sudo npm install -g react-native-cli
+
+---------------------------------------------------------------
+การสร้าง App ด้วย React Native CLI
+---------------------------------------------------------------
+Step 0: เปลี่ยน path ไปยังโฟลเดอร์ AdvancedReactNative
+---
+cd G:\TrainingWorkshop\AdvancedReactNative
+
+Step 1: คำสั่งขึ้นโปรเจ็กต์ใหม่
+---
+$ react-native init ch1Animation --version 0.64.3 หรือ
+$ npx react-native init ch1Animation --version 0.64.3
+
+Step 2: เปิดเข้า VS Code
+---
+$ code ch1Animation -r
+
+Step 3: Start Metro
+---
+$ npm start หรือ
+$ npx react-native start
+
+*** หาก port 8081 ไม่ว่างให้ทำการเคลียร์ก่อน
+$ taskkill /F /IM node.exe  (Windows)
+
+$ ps aux | grep node (MacOS)
+$ kill -9 PID  (MacOS)
+
+Step 4: Run Application
+---
+Android
+---
+$ npm run android หรือ 
+$ npx react-native run-android
+
+iOS
+---
+$ npm run ios หรือ
+$ npx react-native run-ios
+
+Note:: การ Config Eslint (.eslintrc.js)
+---
+module.exports = {
+  root: true,
+  semi: [2, "never"],
+  extends: '@react-native-community',
+}
+
+Note:: การ Config Prettier (.prettierrc.js)
+---
+module.exports = {
+  bracketSpacing: true,
+  jsxBracketSameLine: true,
+  singleQuote: true,
+  trailingComma: 'all',
+  arrowParens: 'avoid',
+  tabWidth: 2,
+  semi: false,
+}
+
+Step 5: ติดตั้ง Dependency สำหรับทำ Navigation Stack พื้นฐาน
+---
+จำเป็น
+---
+npm install @react-navigation/native@6.0.8
+npm install @react-navigation/stack@6.1.1
+npm install react-native-screens@3.13.1
+npm install react-native-safe-area-context@4.2.1
+npm install react-native-reanimated@2.2.2
+npm install react-native-gesture-handler@1.10.3
+
+Step 6: ปรับ compileSdkVersion ให้เป็น 30
+---
+android\build.gradle
+---
+    ext {
+        buildToolsVersion = "29.0.3"
+        minSdkVersion = 21
+        compileSdkVersion = 30
+        targetSdkVersion = 29
+        ndkVersion = "20.1.5948944"
+    }
+
+
+Step 7: ตั้ง Dependency สำหรับทำ Navigation BottomTabs
+---
+npm install @react-navigation/bottom-tabs@6.2.0
+
+Step 8: ตั้ง Dependency สำหรับทำ Drawer
+---
+npm install @react-navigation/drawer@6.1.7
+
+Step 9: ติดตั้ง Dependency สำหรับใช้ภาพ Icon
+npm install react-native-vector-icons@9.1.0
+
+ตัวอย่างการวางโครงสร้างโฟลเดอร์และไฟล์โปรเจ็กต์
+----
+ch1Animation
+    __tests__
+    .bundle
+    .git
+    .vscode
+    android
+    ios
+    node_modules
+    src
+        |-- assets
+            |-- images
+            |-- animations
+                |-- duo-cactus.json
+        |-- components
+            |-- Counter.js
+            |-- Cart.js
+            |-- User.js
+        |-- store
+            |-- Context.js
+            |-- CounterState.js
+            |-- UserState.js
+        |-- model
+        |-- navigations
+            |-- AppStack.js
+            |-- Navigation.js
+            |-- RootStack.js
+        |-- screens
+            |-- AnimateAPI.js
+            |-- AnimateType.js
+            |-- AnimateScrollView.js
+            |-- AnimatebleMakeRain.js
+            |-- Animateble.js
+            |-- LottieAnimation.js
+            |-- Home.js
+        |-- themes
+            |-- MainTheme.js
+    .buckconfig
+    .eslintrc.js
+    .flowconfig
+    .gitignore
+    .prettierrc.js
+    .ruby-version
+    .watchmanconfig
+    App.js
+    app.json
+    babel.config.js
+    Gemfile
+    Gemfile.lock
+    index.js
+    metro.config.js
+    package-lock.json
+    package.json
+
+//--------------------------------------------------------------
+# วันที่ 2
+//--------------------------------------------------------------
+Step 10: ติดตั้ง react-native-animatable
+--
+npm install react-native-animatable
+
+Step 11: ติดตั้ง Lottie animation
+---
+npm i lottie-react-native
+npm i lottie-ios@3.2.3
+
+ขึ้นโปรเจ็กต์ใหม่
+---
+git clone https://github.com/iamsamitdev/ch1Animation.git ch2ContextAPI
+
+เปิดเข้า VSCode
+---
+code ch2ContextAPI -r
+
+Context API
+
+What is Context API?
+---
+Context provides a way to pass data through the component tree without having to pass props down manually at every level
+
+Building Block of Context API
+---
+We can divide Context API in to three parts.
+Context
+First import React from ‘react’. Then, createContext() function from React which takes default value as a first argument. In here optional to pass a Java Script object. There can be multiple context in a single application
+
+Provider
+After create context, Provider Provides the capability to access context which wrapped from it. It provides the data and functions to pass down to all the components.
+
+Consumer
+Consumer allows to access the value to child components which parent that is wrapped by Provider. It has two types.
+
+//--------------------------------------------------------------
+# วันที่ 3
+//--------------------------------------------------------------
+ch2ContactAPI
+    __tests__
+    .bundle
+    .git
+    .vscode
+    android
+    ios
+    node_modules
+    src
+        |-- assets
+            |-- images
+                |-- logo.png
+        |-- components
+            |-- Cart.js
+        |-- store
+            |-- Context.js
+            |-- CounterState.js
+            |-- UserState.js
+        |-- model
+            |-- users.js
+        |-- navigations
+            |-- AppStack.js
+            |-- Navigation.js
+            |-- RootStack.js
+        |-- screens
+            |-- Home.js
+            |-- SplashScreen.js
+            |-- SignInScreen.js
+            |-- SignUpScreen.js
+        |-- themes
+            |-- MainTheme.js
+    .buckconfig
+    .eslintrc.js
+    .flowconfig
+    .gitignore
+    .prettierrc.js
+    .ruby-version
+    .watchmanconfig
+    App.js
+    app.json
+    babel.config.js
+    Gemfile
+    Gemfile.lock
+    index.js
+    metro.config.js
+    package-lock.json
+    package.json
+
+ขั้นตอนการใช้งาน Context API ใน React Native
+---
+Step 1: สร้างไฟล์ Context.js ในโฟลเดอร์ src/store/Context.js
+---
+import React, { createContext } from 'react'
+
+// สร้าง Object Context
+const Context = createContext({})
+
+export default Context
+
+Step 2: สร้างไฟล์เก็บตัวแปร state และฟังก์ชันการทำงาน 
+---
+src/store/CounterState.js
+
+Authentication และ Authorization ใน React Native
+
+Step 1: clone project from github
+---
+git clone  https://github.com/iamsamitdev/ch1Animation.git ch3Authentication
+
+Step 2: install library
+---
+npm i react-native-animatable@1.3.3
+npm i react-native-linear-gradient@2.5.6
+npm i react-native-vector-icons@9.1.0
+
+Step 3: Link resource
+---
+react-native link
+
+Step 4: Create "SplashScreen.js" in /src/screens/SplashScreen.js
+---
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+  StatusBar,
+  Image,
+} from 'react-native'
+import * as Animatable from 'react-native-animatable'
+import LinearGradient from 'react-native-linear-gradient'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import  MainTheme, { colors }  from '../themes/MainTheme'
+
+const SplashScreen = ({ navigation }) => {
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={colors.background} barStyle="light-content" />
+      <View style={styles.header}>
+        <Animatable.Image
+          animation="bounceIn"
+          duraton="1500"
+          source={require('../assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="stretch"
+        />
+      </View>
+      <Animatable.View
+        style={styles.footer}
+        animation="fadeInUpBig">
+        <Text
+          style={styles.title}>
+          ระบบร้านค้าซื้อขายแลกเปลี่ยนสำหรับทุกคน
+        </Text>
+        <Text style={styles.text}>เข้าใช้งานด้วยบัญชีของคุณ</Text>
+        <View style={styles.button}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>
+            <LinearGradient
+              colors={[colors.background1, colors.background]}
+              style={styles.signIn}>
+              <Text style={styles.textSign}>เริ่มต้นใช้งาน</Text>
+              <MaterialIcons name="navigate-next" color={colors.textLight} size={20} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </Animatable.View>
+    </View>
+  )
+}
+
+export default SplashScreen
+
+const { height } = Dimensions.get('screen')
+const height_logo = height * 0.28
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footer: {
+    flex: 1,
+    backgroundColor: colors.textLight,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingVertical: 50,
+    paddingHorizontal: 30,
+  },
+  logo: {
+    width: height_logo,
+    height: height_logo,
+  },
+  title: {
+    color: colors.textDark,
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  text: {
+    color: 'grey',
+    marginTop: 5,
+  },
+  button: {
+    alignItems: 'flex-end',
+    marginTop: 30,
+  },
+  signIn: {
+    width: 150,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+    flexDirection: 'row',
+  },
+  textSign: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+})
+
+
+Step 5: Create "SignInScreen.js" in /src/screens/SignInScreen.js
+---
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Platform,
+  StyleSheet,
+  StatusBar,
+  Alert,
+} from 'react-native'
+import * as Animatable from 'react-native-animatable'
+import LinearGradient from 'react-native-linear-gradient'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Feather from 'react-native-vector-icons/Feather'
+import MainTheme, { colors } from '../themes/MainTheme'
+
+const SignInScreen = ({navigation}) => {
+  return (
+    <View style={styles.container}>
+      
+      <StatusBar backgroundColor={colors.background} barStyle="light-content" />
+      
+      <View style={styles.header}>
+        <Text style={styles.text_header}>ยินดีต้อนรับ</Text>
+      </View>
+
+      <Animatable.View
+        animation="fadeInUpBig"
+        style={styles.footer}>
+
+        <Text
+          style={styles.text_footer}>
+          Username
+        </Text>
+
+        <View style={styles.action}>
+          <FontAwesome name="user-o" color={colors.text} size={20} />
+          <TextInput
+            placeholder="ป้อนชื่อผู้ใช้"
+            placeholderTextColor={colors.textholder}
+            style={[
+              styles.textInput,
+            ]}
+            autoCapitalize="none"
+          />
+        </View>
+
+        <Text
+          style={[
+            styles.text_footer,
+            {
+              marginTop: 35,
+            },
+          ]}>
+          Password
+        </Text>
+
+        <View style={styles.action}>
+          <Feather name="lock" color={colors.text} size={20} />
+          <TextInput
+            placeholder="ป้อนรหัสผ่าน"
+            placeholderTextColor={colors.textholder}
+            secureTextEntry={true}
+            style={styles.textInput}
+            autoCapitalize="none"
+          />
+        </View>
+
+        <TouchableOpacity>
+          <Text style={{ color: colors.background, marginTop: 15 }}>
+            ฉันลืมรหัสผ่าน ?
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.button}>
+          <TouchableOpacity
+            style={styles.signIn}
+            onPress={() => {}}>
+            <LinearGradient
+              colors={[colors.background1, colors.background]}
+              style={styles.signIn}>
+              <Text
+                style={styles.textSign}>
+                เข้าสู่ระบบ
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SignUpScreen')}
+            style={[
+              styles.signIn,
+              {
+                borderColor: colors.background,
+                borderWidth: 1,
+                marginTop: 15,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.textSign,
+                {
+                  color: colors.background,
+                },
+              ]}>
+              ลงทะเบียน
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Animatable.View>
+    </View>
+  )
+}
+
+export default SignInScreen
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingBottom: 50,
+  },
+  footer: {
+    flex: 3,
+    backgroundColor: colors.textLight,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
+  text_header: {
+    color: colors.textLight,
+    fontWeight: 'bold',
+    fontSize: 30,
+  },
+  text_footer: {
+    color: colors.textDark,
+    fontSize: 18,
+  },
+  action: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.forground3,
+    paddingBottom: 5,
+  },
+  actionError: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background2,
+    paddingBottom: 5,
+  },
+  textInput: {
+    flex: 1,
+    marginTop: Platform.OS === 'ios' ? 0 : -12,
+    paddingLeft: 10,
+    color: colors.textDark,
+  },
+  errorMsg: {
+    color: colors.background2,
+    fontSize: 14,
+  },
+  button: {
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  signIn: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  textSign: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.textLight,
+  },
+})
+
+
+Step 6: Create "SignUpScreen.js" in /src/screens/SignUpScreen.js
+---
+import React from 'react'
+import {
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+  Dimensions,
+  TextInput,
+  Platform,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+} from 'react-native'
+import * as Animatable from 'react-native-animatable'
+import LinearGradient from 'react-native-linear-gradient'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Feather from 'react-native-vector-icons/Feather'
+import MainTheme, { colors } from '../themes/MainTheme'
+
+const SignInScreen = ({ navigation }) => {
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={colors.background} barStyle="light-content" />
+      <View style={styles.header}>
+        <Text style={styles.text_header}>ลงทะเบียนฟรี!</Text>
+      </View>
+      <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+        <ScrollView>
+          <Text style={styles.text_footer}>Username</Text>
+          
+          <View style={styles.action}>
+            <FontAwesome name="user-o" color={colors.text} size={20} />
+            <TextInput
+              placeholder="ป้อนชื่อผู้ใช้"
+              style={styles.textInput}
+              autoCapitalize="none"
+            />
+          </View>
+
+          <Text
+            style={[
+              styles.text_footer,
+              {
+                marginTop: 35,
+              },
+            ]}>
+            Password
+          </Text>
+          <View style={styles.action}>
+            <Feather name="lock" color={colors.textDark} size={20} />
+            <TextInput
+              placeholder="ป้อนรหัสผ่าน"
+              secureTextEntry={true}
+              style={styles.textInput}
+              autoCapitalize="none"
+            />
+          </View>
+
+          <Text
+            style={[
+              styles.text_footer,
+              {
+                marginTop: 35,
+              },
+            ]}>
+            Confirm Password
+          </Text>
+          <View style={styles.action}>
+            <Feather name="lock" color={colors.textDark} size={20} />
+            <TextInput
+              placeholder="ป้อนยืนยันรหัสผ่าน"
+              secureTextEntry={true}
+              style={styles.textInput}
+              autoCapitalize="none"
+            />
+          </View>
+          <View style={styles.textPrivate}>
+            <Text style={styles.color_textPrivate}>
+              ท่านรับทราบและยอมรับ
+            </Text>
+            <Text style={[styles.color_textPrivate, { fontWeight: 'bold' }]}>
+              {' '}
+              เงื่อนไข
+            </Text>
+            <Text style={styles.color_textPrivate}> และ</Text>
+            <Text style={[styles.color_textPrivate, { fontWeight: 'bold' }]}>
+              {' '}
+              นโนบายการใช้งาน
+            </Text>
+          </View>
+          <View style={styles.button}>
+            <TouchableOpacity style={styles.signIn} onPress={() => {}}>
+              <LinearGradient
+                colors={[colors.background1, colors.background]}
+                style={styles.signIn}>
+                <Text
+                  style={[
+                    styles.textSign,
+                    {
+                      color: colors.textLight,
+                    },
+                  ]}>
+                  ลงทะเบียน
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={[
+                styles.signIn,
+                {
+                  borderColor: colors.background,
+                  borderWidth: 1,
+                  marginTop: 15,
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.textSign,
+                  {
+                    color: colors.background,
+                  },
+                ]}>
+                เข้าสู่ระบบ
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </Animatable.View>
+    </View>
+  )
+}
+
+export default SignInScreen
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingBottom: 50,
+  },
+  footer: {
+    flex: Platform.OS === 'ios' ? 3 : 5,
+    backgroundColor: colors.textLight,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
+  text_header: {
+    color: colors.textLight,
+    fontWeight: 'bold',
+    fontSize: 30,
+  },
+  text_footer: {
+    color: colors.background,
+    fontSize: 18,
+  },
+  action: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.forground3,
+    paddingBottom: 5,
+  },
+  textInput: {
+    flex: 1,
+    marginTop: Platform.OS === 'ios' ? 0 : -12,
+    paddingLeft: 10,
+    color: colors.background,
+  },
+  button: {
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  signIn: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  textSign: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  textPrivate: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 20,
+  },
+  color_textPrivate: {
+    color: 'grey',
+  },
+})
+
+Step 7: Create "users.js" in /src/models/users.js
+---
+export default Users = [
+    {
+        id: 1, 
+        email: 'user1@email.com',
+        username: 'user1', 
+        password: 'password', 
+        userToken: 'token123'
+    },
+    {
+        id: 2, 
+        email: 'user2@email.com',
+        username: 'user2', 
+        password: 'pass1234', 
+        userToken: 'token12345'
+    },
+    {
+        id: 3, 
+        email: 'testuser@email.com',
+        username: 'testuser', 
+        password: 'testpass', 
+        userToken: 'testtoken'
+    },
+];
+
+//--------------------------------------------------------------
+# วันที่ 4
+//--------------------------------------------------------------
+secondmarket
+    __tests__
+    .bundle
+    .git
+    .vscode
+    android
+    ios
+    node_modules
+    src
+        |-- assets
+            |-- images
+                |-- logo.png
+        |-- components
+            |-- Card.js
+            |-- Screen.js
+        |-- store
+            |-- Context.js
+        |-- model
+            |-- users.js
+        |-- navigations
+            |-- AppNavigator.js
+            |-- Navigation.js
+            |-- AuthNavigator.js
+            |-- FeedNavigator.js
+            |-- NewListingButton.js
+            |-- ProfileNavigator.js
+        |-- screens
+            |-- Home.js
+            |-- ListingsScreen.js
+            |-- ListingDetailsScreen.js
+            |-- SplashScreen.js
+            |-- SignInScreen.js
+            |-- SignUpScreen.js
+        |-- themes
+            |-- MainTheme.js
+    .buckconfig
+    .eslintrc.js
+    .flowconfig
+    .gitignore
+    .prettierrc.js
+    .ruby-version
+    .watchmanconfig
+    App.js
+    app.json
+    babel.config.js
+    Gemfile
+    Gemfile.lock
+    index.js
+    metro.config.js
+    package-lock.json
+    package.json
+
+Step 0: ขึ้นโปรเจ็กต์ใหม่ กำหนด Package name
+---
+react-native init secondmarket --package=com.itgenius.secondmarket --version 0.64.3
+
+Step 1: ติดตั้ง Dependency สำหรับทำ Navigation BottomTabs
+---
+npm install @react-navigation/bottom-tabs@6.2.0
+
+Note:: การ Config Eslint (.eslintrc.js)
+---
+module.exports = {
+  root: true,
+  semi: [2, "never"],
+  extends: '@react-native-community',
+}
+
+Note:: การ Config Prettier (.prettierrc.js)
+---
+module.exports = {
+  bracketSpacing: true,
+  jsxBracketSameLine: true,
+  singleQuote: true,
+  trailingComma: 'all',
+  arrowParens: 'avoid',
+  tabWidth: 2,
+  semi: false,
+}
+
+Step 3: ติดตั้ง Dependency สำหรับทำ Navigation Stack พื้นฐาน
+---
+จำเป็น
+---
+npm install @react-navigation/native@6.0.8
+npm install @react-navigation/stack@6.1.1
+npm install react-native-screens@3.13.1
+npm install react-native-safe-area-context@4.2.1
+npm install react-native-reanimated@2.2.2
+npm install react-native-gesture-handler@1.10.3
+npm install @react-navigation/bottom-tabs@6.2.0
+npm install react-native-vector-icons@9.1.0
+npm install react-native-animatable@1.3.3
+npm install react-native-linear-gradient@2.5.6
+
+Step 4: ปรับ compileSdkVersion ให้เป็น 30
+---
+android\build.gradle
+---
+    ext {
+        buildToolsVersion = "29.0.3"
+        minSdkVersion = 21
+        compileSdkVersion = 30
+        targetSdkVersion = 29
+        ndkVersion = "20.1.5948944"
+    }
+
+Step 5: ทำการอัพเดทไฟล์ ด้วย react-native link
+---
+react-native link
+
+Step 6: สร้างหน้า Screen
+---
+ListingsScreen
+ListingDetailsScreen
+MarketScreen
+PostingScreen
+ChatScreen
+ProfileScreen
+----
+MyListingsScreen
+FavoriteScreen
+NotificationScreen
+HelpScreen
+SettingScreen
+
+//--------------------------------------------------------------
+# วันที่ 5
+//--------------------------------------------------------------
+
+Step 1: ติดตั้ง @react-native-async-storage/async-storage ไว้จัดการเก็บข้อมูลแบบ offline storage
+---
+npm i @react-native-async-storage/async-storage@1.17.3
+
+Step 2: แก้ไขไฟล์ src/navigations/Navigation.js
+---
+secondmarket
+    __tests__
+    .bundle
+    .git
+    .vscode
+    android
+    ios
+    node_modules
+    src
+        |-- assets
+            |-- images
+                |-- logo.png
+            |-- fonts
+        |-- components
+            |-- forms
+                |--ErrorMessage.js
+                |--Form.js
+                |--FormField.js
+                |--FormImagePicker.js
+                |--index.js
+                |--SubmitButton.js
+            |-- lists
+                |--index.js
+                |--ListItem.js
+                |--ListItemDeleteAction.js
+                |--ListItemSeparator.js
+            |-- Card.js
+            |-- Icon.js
+            |-- Button.js
+            |-- ImageInputList.js
+            |-- ImageInput.js
+            |--TextInput.js
+            |-- Screen.js
+        |-- store
+            |-- Context.js
+        |-- firebase
+            |-- firebase-config.js
+        |-- model
+            |-- users.js
+        |-- navigations
+            |-- AppNavigator.js
+            |-- Navigation.js
+            |-- AuthNavigator.js
+            |-- FeedNavigator.js
+            |-- NewListingButton.js
+            |-- ProfileNavigator.js
+        |-- screens
+            |-- Home.js
+            |-- ListingsScreen.js
+            |-- ListingDetailsScreen.js
+            |-- ProfileScreen.js
+            |-- PostingScreen.js
+            |-- SplashScreen.js
+            |-- SignInScreen.js
+            |-- SignUpScreen.js
+        |-- themes
+            |-- MainTheme.js
+    .buckconfig
+    .eslintrc.js
+    .flowconfig
+    .gitignore
+    .prettierrc.js
+    .ruby-version
+    .watchmanconfig
+    App.js
+    app.json
+    babel.config.js
+    Gemfile
+    Gemfile.lock
+    index.js
+    metro.config.js
+    package-lock.json
+    package.json
+
+Step 3: ติดตั้ง library สำหรับแสดง popup
+npm install react-native-elements@3.4.2 -f
+
+Step 4: ติดตั้ง library สำหรับทำ slide image
+---
+npm i react-native-image-slider-box@1.1.22
+
+Step 5: ติดตั้ง library สำหรับทำจัดการแบบฟอร์ม
+---
+npm i formik@2.1.4
+npm i yup@0.28.5
+
+Step 6: ติดตั้ง library สำหรับทำ image picker
+---
+npm i react-native-image-picker@3.8.1
+
+Step 7: รันคำสั่ง link
+---
+react-native link
+
+พบปัญหา run แล้วฟ้อง
+Error type 3
+Error: Activity class {com.secondmarket/com.secondmarket.MainActivity} does not exist
+
+แก้ด้วยคำสั่ง
+---
+adb uninstall "package name"
+เช่น
+adb uninstall com.secondmarket
+
+//--------------------------------------------------------------
+# วันที่ 6
+//--------------------------------------------------------------
+
+การทำ Custom font  ใน React Native
+---
+Step 1: เตรียมไฟล์ fonts มาไว้ที่ assets/fonts
+Step 2: จากนั้นสร้างไฟล์ react-native.config.js ที่ root
+---
+module.exports = {
+  project: {
+    ios: {},
+    android: {}, // grouped into "project"
+  },
+  assets: ["./src/assets/fonts/"], // stays the same
+};
+
+Step 3: เพิ่มคำสั่ง Link
+---
+react-native link
+
+Step 4: ทดลองเปลี่ยนฟอนต์
+---
+แก้ไขไฟล์ \src\components\TextInput.js
+
+<TextInput
+        style={styles.inputField}
+        placeholderTextColor={colors.medium}
+        {...otherProps}
+/>
+
+const styles = StyleSheet.create({
+inputField: {
+    width: '100%',
+    fontSize: 18,
+    fontFamily: "NotoSansThai-Regular"
+  }
+})
+
+Step 5: แก้ไขไฟล์ package.json
+--- 
+  "rnpm": {
+    "assets": [
+      "./src/assets/fonts/"
+    ]
+  }
+
+เปลี่ยนฟอนต์เฉพาะใน android
+---
+สร้างโฟลเดอร์ฟอนต์ใน main/res/font แล้ววางฟอนต์ไว้
+จากนั้นแก้ไขที่ไฟล์ styles.xml 
+---
+<item name="android:fontFamily">@font/notosanthai</item>
+
+Step 6: เปลี่ยนฟอนต์แบบ Global (ทั้งแอพ)
+---
+ติดตั้ง react-native-global-font
+npm i react-native-global-font@1.0.3
+
+Step 6: ทำการสั่ง Link
+---
+npx react-native link
+
+Step 7: เรียกกำหนดค่าที่ไฟล์ App.js
+---
+import React, { useEffect } from 'react'
+import Navigation from './src/navigations/Navigation'
+import GlobalFont from 'react-native-global-font'
+
+const App = () => {
+
+  useEffect(() => {
+    let fontName = 'NotoSansThai-Regular'
+    GlobalFont.applyGlobal(fontName)
+  }, [])
+  
+
+  return <Navigation />
+}
+
+export default App
+
+------------------------------------------------
+React Native ร่วมกับ Firebase
+-------------------------------------------------
+Step 1: สร้างโปรเจ็กต์ Firebase ที่ https://console.firebase.google.com
+
+Step 2: ติดตั้ง library firebase
+---
+npm install firebase@9.7.0
+
+Step 3: สร้างไฟล์ config firebase ที่
+src\firebase\firebase-config.js
+---
+import { initializeApp } from 'firebase/app'
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyALcbdoA71aliJ2by0ixxXPsUVJqSfmdfo',
+  authDomain: 'reactnative-authen-bffae.firebaseapp.com',
+  projectId: 'reactnative-authen-bffae',
+  storageBucket: 'reactnative-authen-bffae.appspot.com',
+  messagingSenderId: '191757207257',
+  appId: '1:191757207257:web:9b214f6c8da6230995e0c8',
+}
+
+const app = initializeApp(firebaseConfig)
+
+Step 4: เปิดใช้งาน Authentication ใน Firebase
+---
+
+Step 5: เขียนการ Auth ด้วย Email/Password
+แก้ไขไฟล์
+src\firebase\firebase-config.js
+---
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyALcbdoA71aliJ2by0ixxXPsUVJqSfmdfo',
+  authDomain: 'reactnative-authen-bffae.firebaseapp.com',
+  projectId: 'reactnative-authen-bffae',
+  storageBucket: 'reactnative-authen-bffae.appspot.com',
+  messagingSenderId: '191757207257',
+  appId: '1:191757207257:web:9b214f6c8da6230995e0c8',
+}
+
+const app = initializeApp(firebaseConfig)
+export const authentication = getAuth(app)
+
+Step 6: เขียนส่วนการ Register ผ่าน Firebase
+แก้ไขไฟล์ src\screens\SignUpScreen.js
+---
+// Import Firebase Config
+import { authentication  } from './../firebase/firebase-config'
+
+// Import createUserWithEmailAndPassword form firebase/auth
+import { createUserWithEmailAndPassword } from "firebase/auth"
+
+// สร้างตัวแปรรับค่าจากฟอร์ม
+  const [data, setData] = useState({
+    email: '',
+    password: '',
+    confirm_password: '',
+    check_textInputChange: false,
+    secureTextEntry: true,
+    confirm_secureTextEntry: true,
+    isValidEmail: true,
+    isValidPassword: true,
+    isValidConfirmPassword: true,
+    isValidPasswordMatch: true
+  })
+
+const [visible, setVisible] = useState(false)
+const [formError, setFormError] = useState(false)
+  const [signUpError, setSignUpError] = useState(false)
+  const [signUpSuccess, setSignUpSuccess] = useState(false)
+
+// สร้างฟังก์ชัน handleRegister
+ const registerHandle = (email, password) => {
+    if (!data.isValidEmail || !data.isValidPassword || (data.email.length == 0 || data.password.length == 0 || data.confirm_password == 0 || data.password != data.confirm_password)) {
+      setVisible(true)
+      setFormError(true)
+      return
+    }else{
+      // console.log(data.email + data.password)
+      createUserWithEmailAndPassword(authentication, data.email, data.password)
+      .then(result => {
+        // Signed in
+        const user = result.user
+        console.log(result, null, 2)
+
+        setVisible(true)
+        setFormError(false)
+        setSignUpError(false)
+        setSignUpSuccess(true)
+
+      })
+      .catch(error => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log(error)
+        setVisible(true)
+        setFormError(false)
+        setSignUpError(true)
+      })
+    }
+  }
+
+// แสดง Popup Message
+{
+        formError ? 
+        <Overlay isVisible={visible} onBackdropPress={()=>setVisible(false)}>
+          <View style={{padding: 20,}}>
+            <Text style={styles.title}>มีข้อผิดพลาด</Text>
+            <Text style={styles.subtitle}>ป้อนอีเมล์และรหัสผ่านให้ถูกต้องก่อน</Text>
+          </View>
+        </Overlay> : null
+      }
+
+      {
+        signUpError ? 
+        <Overlay isVisible={visible} onBackdropPress={()=>setVisible(false)}>
+          <View style={{padding: 20,}}>
+            <Text style={styles.title}>มีข้อผิดพลาด</Text>
+            <Text style={styles.subtitle}>ไม่สามารถลงทะเบียนได้</Text>
+          </View>
+        </Overlay> : null
+      }
+
+      {
+        signUpSuccess ? 
+        <Overlay isVisible={visible} onBackdropPress={()=>setVisible(false)}>
+          <View style={{padding: 20,}}>
+            <Text style={styles.title}>สำเร็จ</Text>
+            <Text style={styles.subtitle}>ลงทะเบียนเรียบร้อยแล้ว</Text>
+          </View>
+        </Overlay> : null
+      }
+
+
+
+การสั่ง build แอพเป็น Release
+---
+npx react-native run-android --variant=release
+
+ไฟล์ apk จะอยู่ที่ android/app/build/outputs/apk/release/app-release.apk
+
+//--------------------------------------------------------------
+# วันที่ 7
+//--------------------------------------------------------------
+การเชื่อมต่อกับ Firebase firestore
+
+secondmarket
+    __tests__
+    .bundle
+    .git
+    .vscode
+    android
+    ios
+    node_modules
+    src
+        |-- assets
+            |-- images
+                |-- logo.png
+            |-- fonts
+        |-- components
+            |-- forms
+                |--ErrorMessage.js
+                |--Form.js
+                |--FormField.js
+                |--FormImagePicker.js
+                |--index.js
+                |--SubmitButton.js
+            |-- lists
+                |--index.js
+                |--ListItem.js
+                |--ListItemDeleteAction.js
+                |--ListItemSeparator.js
+            |-- Card.js
+            |-- Icon.js
+            |-- Button.js
+            |-- ImageInputList.js
+            |-- ImageInput.js
+            |--TextInput.js
+            |-- Screen.js
+        |-- store
+            |-- Context.js
+        |-- firebase
+            |-- firebase-config.js
+        |-- model
+            |-- users.js
+        |-- navigations
+            |-- AppNavigator.js
+            |-- Navigation.js
+            |-- AuthNavigator.js
+            |-- FeedNavigator.js
+            |-- NewListingButton.js
+            |-- ProfileNavigator.js
+        |-- screens
+            |-- Home.js
+            |-- ListingsScreen.js
+            |-- ListingDetailsScreen.js
+            |-- ProfileScreen.js
+            |-- PostingScreen.js
+            |-- SplashScreen.js
+            |-- SignInScreen.js
+            |-- SignUpScreen.js
+        |-- themes
+            |-- MainTheme.js
+    .buckconfig
+    .eslintrc.js
+    .flowconfig
+    .gitignore
+    .prettierrc.js
+    .ruby-version
+    .watchmanconfig
+    App.js
+    app.json
+    babel.config.js
+    Gemfile
+    Gemfile.lock
+    index.js
+    metro.config.js
+    package-lock.json
+    package.json
+
+การเพิ่มข้อมูลเข้า firestore
+---
+ทำได้ด้วย 2 module
+1. setDoc  (ต้องกำหนดเลข document id เอง)
+2. addDoc (firestore จะกำหนด document id ให้เอง)
